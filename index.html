@@ -1,1 +1,23 @@
-<!DOCTYPE html><body><canvas id=c width=300 height=300 style="background:#111;border:2px solid green"></canvas><script>let a=c.getContext("2d"),b=15,d=20,e=[{x:10,y:10}],f=1,g=0,h={x:5,y:5};setInterval(()=>{let j={x:e[0].x+f,y:e[0].y+g};if(j.x<0||j.y<0||j.x>=d||j.y>=d||e.some(k=>k.x==j.x&&k.y==j.y))e=[{x:10,y:10}];else{e.unshift(j);if(j.x==h.x&&j.y==h.y)h={x:Math.random()*d|0,y:Math.random()*d|0};else e.pop()}a.fillStyle="#111";a.fillRect(0,0,300,300);a.fillStyle="red";a.fillRect(h.x*b,h.y*b,12,12);a.fillStyle="lime";e.map(k=>a.fillRect(k.x*b,k.y*b,12,12))},120);addEventListener("keydown",k=>{if(k.key=="ArrowUp")f=0,g=-1;if(k.key=="ArrowDown")f=0,g=1;if(k.key=="ArrowLeft")f=-1,g=0;if(k.key=="ArrowRight")f=1,g=0})</script><br><button onclick="f=0;g=-1">UP</button><button onclick="f=0;g=1">DOWN</button><button onclick="f=-1;g=0">LEFT</button><button onclick="f=1;g=0">RIGHT</button>
+<!DOCTYPE html><meta name=viewport content="width=device-width,initial-scale=1"><style>
+body{margin:0;background:#070a0f;color:#fff;text-align:center;font-family:sans-serif}
+canvas{border:3px solid #1a5c45;background:#111;border-radius:12px}
+button{border:0;border-radius:12px;padding:12px 16px;margin:4px;background:#1e2a3a;color:#5af2c8;font-weight:bold}
+#b{width:192px;display:grid;grid-template-columns:60px 60px 60px;gap:6px;margin:12px auto}
+</style><h2 style=color:#5af2c8>Score:<span id=s>0</span></h2>
+<button onclick="start()" style="background:#5af2c8;color:#000">▶ START GAME</button>
+<canvas id=c width=300 height=300></canvas>
+<div id=b>
+<button style=grid-column:2 onclick="dx=0;dy=-1">▲</button>
+<button onclick="dx=-1;dy=0">◀</button>
+<button onclick="dx=0;dy=1">▼</button>
+<button onclick="dx=1;dy=0">▶</button>
+</div>
+<button onclick="alert('To DOWNLOAD: Chrome 3 dots > Add to Home Screen')">📲 DOWNLOAD APP</button>
+<script>
+let cv=c.getContext("2d"),S=15,N=20,sn,dx,dy,f,sc,t;
+function init(){sn=[{x:10,y:10}];dx=1;dy=0;f={x:5,y:5};sc=0}
+function draw(){cv.fillStyle="#111";cv.fillRect(0,0,300,300);cv.fillStyle="red";cv.fillRect(f.x*S,f.y*S,S-2,S-2);cv.fillStyle="#5af2c8";sn.forEach(p=>cv.fillRect(p.x*S,p.y*S,S-2,S-2));s.innerText=sc}
+function loop(){let h={x:sn[0].x+dx,y:sn[0].y+dy};if(h.x<0||h.y<0||h.x>=N||h.y>=N||sn.some(v=>v.x==h.x&&v.y==h.y)){clearInterval(t);alert("GAME OVER Score:"+sc);return}sn.unshift(h);if(h.x==f.x&&h.y==f.y){sc++;f={x:Math.random()*N|0,y:Math.random()*N|0}}else sn.pop();draw()}
+function start(){init();clearInterval(t);t=setInterval(loop,120);draw()}
+init();draw();
+</script>
