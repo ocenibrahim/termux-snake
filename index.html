@@ -6,11 +6,11 @@ button{border:0;border-radius:12px;padding:12px 16px;margin:4px;background:#1e2a
 </style><h2 style=color:#5af2c8>Score:<span id=s>0</span></h2>
 <button onclick="start()" style="background:#5af2c8;color:#000">▶ START GAME</button>
 <canvas id=c width=300 height=300></canvas>
-<div id=b>
-<button style=grid-column:2 onclick="dx=0;dy=-1">▲</button>
-<button onclick="dx=-1;dy=0">◀</button>
-<button onclick="dx=0;dy=1">▼</button>
-<button onclick="dx=1;dy=0">▶</button>
+<div id=b style="width:192px;display:grid;grid-template-columns:60px 60px 60px;grid-template-rows:60px 60px 60px;gap:6px;margin:12px auto">
+<button style="grid-column:2;grid-row:1" onclick="dx=0;dy=-1">▲</button>
+<button style="grid-column:1;grid-row:2" onclick="dx=-1;dy=0">◀</button>
+<button style="grid-column:2;grid-row:3" onclick="dx=0;dy=1">▼</button>
+<button style="grid-column:3;grid-row:2" onclick="dx=1;dy=0">▶</button>
 </div>
 <button onclick="alert('To DOWNLOAD: Chrome 3 dots > Add to Home Screen')">📲 DOWNLOAD APP</button>
 <script>
