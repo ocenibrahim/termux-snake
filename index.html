@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snake</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      color: #eee;
+      user-select: none;
+    }
+    h1 { font-size: 2rem; letter-spacing: 4px; margin-bottom: 12px; color: #4ecca3; text-transform: uppercase; }
+    #scoreboard { display: flex; gap: 40px; margin-bottom: 14px; font-size: 0.95rem; letter-spacing: 1px; color: #aaa; }
+    #scoreboard span { color: #fff; font-weight: bold; }
+    canvas { border: 2px solid #4ecca3; border-radius: 6px; box-shadow: 0 0 30px rgba(78,204,163,0.2); display: block; }
+    #overlay { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+    #message { font-size: 2rem; font-weight: bold; color: #4ecca3; letter-spacing: 2px; }
+    #sub { font-size: 1rem; color: #aaa; }
+    button { margin-top: 8px; padding: 10px 32px; font-size: 1rem; background: #4ecca3; color: #1a1a2e; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; letter-spacing: 1px; transition: background 0.2s; }
+    button:hover { background: #38b890; }
+    #controls { margin-top: 14px; font-size: 0.8rem; color: #555; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+  <h1>Snake</h1>
+  <div id="scoreboard">SCORE: <span id="score">0</span> &nbsp;&nbsp; BEST: <span id="best">0</span></div>
+  <div style="position:relative;">
+    <canvas id="c" width="400" height="400"></canvas>
+    <div id="overlay">
+      <div id="message">SNAKE</div>
+      <div id="sub">Use arrow keys or WASD to move</div>
+      <button id="btn">Start Game</button>
+    </div>
+  </div>
+  <div id="controls">W A S D or Arrow Keys | P to pause</div>
+  <script>
+    const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),COLS=20,ROWS=20,CELL=canvas.width/COLS,SPEEDS=[150,120,100,85,70];let snake,dir,nextDir,food,score,best,gameLoop,running,paused;best=parseInt(localStorage.getItem('snakeBest')||'0');document.getElementById('best').textContent=best;const overlay=document.getElementById('overlay'),msgEl=document.getElementById('message'),subEl=document.getElementById('sub'),btn=document.getElementById('btn'),scoreEl=document.getElementById('score'),bestEl=document.getElementById('best');function rnd(n){return Math.floor(Math.random()*n)}function spawnFood(){let p;do{p={x:rnd(COLS),y:rnd(ROWS)}}while(snake.some(s=>s.x===p.x&&s.y===p.y));food=p}function init(){snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];dir={x:1,y:0};nextDir={x:1,y:0};score=0;scoreEl.textContent=0;spawnFood()}function spd(s){return s<5?SPEEDS[0]:s<10?SPEEDS[1]:s<20?SPEEDS[2]:s<35?SPEEDS[3]:SPEEDS[4]}function step(){dir=nextDir;const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(h.x<0||h.x>=COLS||h.y<0||h.y>=ROWS)return endGame();if(snake.some(s=>s.x===h.x&&s.y===h.y))return endGame();snake.unshift(h);if(h.x===food.x&&h.y===food.y){score++;scoreEl.textContent=score;if(score>best){best=score;bestEl.textContent=best;localStorage.setItem('snakeBest',best)}spawnFood();clearInterval(gameLoop);gameLoop=setInterval(step,spd(score))}else{snake.pop()}draw()}function draw(){ctx.fillStyle='#0f0f1a';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(255,255,255,0.03)';ctx.lineWidth=0.5;for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*CELL,0);ctx.lineTo(x*CELL,canvas.height);ctx.stroke()}for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*CELL);ctx.lineTo(canvas.width,y*CELL);ctx.stroke()}const fx=food.x*CELL+CELL/2,fy=food.y*CELL+CELL/2;ctx.save();ctx.shadowBlur=12;ctx.shadowColor='#ff6b6b';ctx.fillStyle='#ff6b6b';ctx.beginPath();ctx.arc(fx,fy,CELL/2-2,0,Math.PI*2);ctx.fill();ctx.restore();snake.forEach((seg,i)=>{const t=i/snake.length,g=Math.floor(180+(1-t)*60);ctx.fillStyle=i===0?'#4ecca3':`rgb(30,${g},120)`;ctx.shadowBlur=i===0?10:0;ctx.shadowColor='#4ecca3';ctx.beginPath();ctx.roundRect(seg.x*CELL+1,seg.y*CELL+1,CELL-2,CELL-2,3);ctx.fill();ctx.shadowBlur=0});const hd=snake[0];ctx.fillStyle='#1a1a2e';const ex=dir.y!==0?[4,10]:(dir.x>0?[10,10]:[4,4]),ey=dir.x!==0?[4,10]:(dir.y>0?[10,10]:[4,4]);ctx.beginPath();ctx.arc(hd.x*CELL+ex[0],hd.y*CELL+ey[0],2.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(hd.x*CELL+ex[1],hd.y*CELL+ey[1],2.5,0,Math.PI*2);ctx.fill()}function endGame(){clearInterval(gameLoop);running=false;draw();ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,canvas.width,canvas.height);msgEl.textContent='GAME OVER';subEl.textContent=`Score: ${score}`;btn.textContent='Play Again';overlay.style.display='flex'}function startGame(){overlay.style.display='none';init();draw();running=true;paused=false;clearInterval(gameLoop);gameLoop=setInterval(step,spd(0))}btn.addEventListener('click',startGame);document.addEventListener('keydown',e=>{if(!running)return;if(e.key==='p'||e.key==='P'){paused=!paused;if(paused){clearInterval(gameLoop);ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#4ecca3';ctx.font='bold 28px Segoe UI';ctx.textAlign='center';ctx.fillText('PAUSED',canvas.width/2,canvas.height/2)}else{gameLoop=setInterval(step,spd(score))}return}if(paused)return;const map={'ArrowUp':{x:0,y:-1},'ArrowDown':{x:0,y:1},'ArrowLeft':{x:-1,y:0},'ArrowRight':{x:1,y:0},'w':{x:0,y:-1},'W':{x:0,y:-1},'s':{x:0,y:1},'S':{x:0,y:1},'a':{x:-1,y:0},'A':{x:-1,y:0},'d':{x:1,y:0},'D':{x:1,y:0}};const nd=map[e.key];if(nd&&!(nd.x===-dir.x&&nd.y===-dir.y)){nextDir=nd;e.preventDefault()}});ctx.fillStyle='#0f0f1a';ctx.fillRect(0,0,canvas.width,canvas.height);
+  </script>
+</body>
+</html>
